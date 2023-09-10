@@ -25,27 +25,29 @@ class App extends Component {
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
-    name: '',
-    number: '',
   };
 
-  handleNameChange = e => {
-    this.setState({ name: e.target.value });
+  handleFilterChange = (e) => {
+    this.setState({ filter: e.target.value });
   };
 
-  handleNumberChange = e => {
-    this.setState({ number: e.target.value });
+  handleDeleteContact = (contactId) => {
+    this.setState((prevState) => ({
+      contacts: prevState.contacts.filter((contact) => contact.id !== contactId),
+    }));
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
-    const { name, number, contacts } = this.state;
+  getFilteredContacts = () => {
+    const { contacts, filter } = this.state;
+    return contacts.filter((contact) =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  };
 
-    if (name.trim() === '' || number.trim() === '') {
-      return;
-    }
+  handleSubmit = (name, number) => {
+    const { contacts } = this.state;
 
-    if (contacts.some(contact => contact.name === name)) {
+    if (contacts.some((contact) => contact.name === name)) {
       alert(`${name} is already in contacts!`);
       return;
     }
@@ -56,43 +58,18 @@ class App extends Component {
       number,
     };
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       contacts: [...prevState.contacts, newContact],
-      name: '',
-      number: '',
     }));
-  };
-
-  handleFilterChange = e => {
-    this.setState({ filter: e.target.value });
-  };
-
-  handleDeleteContact = contactId => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
-    }));
-  };
-
-  getFilteredContacts = () => {
-    const { contacts, filter } = this.state;
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase())
-    );
   };
 
   render() {
-    const { name, number, filter } = this.state;
+    const { filter } = this.state;
 
     return (
       <AppWrapper>
         <Title>Phonebook</Title>
-        <ContactForm
-          name={name}
-          number={number}
-          onNameChange={this.handleNameChange}
-          onNumberChange={this.handleNumberChange}
-          onSubmit={this.handleSubmit}
-        />
+        <ContactForm onSubmit={this.handleSubmit} />
         <SubTitle>Find contacts by name:</SubTitle>
         <Filter value={filter} onChange={this.handleFilterChange} />
         <SubTitle>Contacts:</SubTitle>
